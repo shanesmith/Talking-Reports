@@ -4,14 +4,16 @@
  * Tests the Arr lib that's shipped with kohana
  *
  * @group kohana
+ * @group kohana.arr
  *
- * @package    Unittest
+ * @package    Kohana
+ * @category   Tests
  * @author     Kohana Team
  * @author     BRMatt <matthew@sigswitch.com>
- * @copyright  (c) 2008-2009 Kohana Team
- * @license    http://kohanaphp.com/license
+ * @copyright  (c) 2008-2011 Kohana Team
+ * @license    http://kohanaframework.org/license
  */
-Class Kohana_ArrTest extends Kohana_Unittest_TestCase
+class Kohana_ArrTest extends Unittest_TestCase
 {
 	/**
 	 * Provides test data for test_callback()
@@ -95,6 +97,42 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 		$this->assertSame($expected, $array);
 	}
 
+	/**
+	 * Provides test data for test_pluck
+	 *
+	 * @return array
+	 */
+	public function provider_pluck()
+	{
+		return array(
+			array(
+				array(
+					  array('id' => 20, 'name' => 'John Smith'),
+					  array('name' => 'Linda'),
+					  array('id' => 25, 'name' => 'Fred'),
+					 ),
+				'id',
+				array(20, 25)
+			),
+		);
+	}
+
+	/**
+	 * Tests Arr::pluck()
+	 *
+	 * @test
+	 * @dataProvider provider_pluck
+	 * @param array $array
+	 * @param string $key
+	 * @param array $expected
+	 */
+	public function test_pluck(array $array, $key, $expected)
+	{
+		$array = Arr::pluck($array, $key);
+
+		$this->assertSame(count($expected), count($array));
+		$this->assertSame($expected, $array);
+	}
 
 	/**
 	 * Provides test data for test_get()
@@ -161,6 +199,38 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 		);
 	}
 
+	/**
+	 * Provides test data for test_is_array()
+	 *
+	 * @return array
+	 */
+	public function provider_is_array()
+	{
+		return array(
+			array($a = array('one', 'two', 'three'), TRUE),
+			array(new ArrayObject($a), TRUE),
+			array(new ArrayIterator($a), TRUE),
+			array('not an array', FALSE),
+			array(new stdClass, FALSE),
+		);
+	}
+
+	/**
+	 * Tests Arr::is_array()
+	 *
+	 * @test
+	 * @dataProvider provider_is_array
+	 * @param mixed   $value     Value to check
+	 * @param boolean $expected  Is $value an array?
+	 */
+	public function test_is_array($array, $expected)
+	{
+		$this->assertSame(
+			$expected,
+			Arr::is_array($array)
+		);
+	}
+
 	public function provider_merge()
 	{
 		return array(
@@ -171,6 +241,11 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 				array('name' => 'mary', 'children' => array('jane')),
 			),
 			// See how it merges sub-arrays with numerical indexes
+			array(
+				array(array('test1','test3'), array('test2','test4')),
+				array(array('test1'), array('test2')),
+				array(array('test3'), array('test4')),
+			),
 			array(
 				array(array('test1','test3'), array('test2','test4')),
 				array(array('test1'), array('test2')),
@@ -221,7 +296,7 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 	}
 
 	/**
-	 * Provides test data for test_get()
+	 * Provides test data for test_path()
 	 *
 	 * @return array
 	 */
@@ -233,7 +308,9 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 			'users'  => array(
 				1 => array('name' => 'matt'),
 				2 => array('name' => 'john', 'interests' => array('hocky' => array('length' => 2), 'football' => array())),
+				3 => 'frank', // Issue #3194
 			),
+			'object' => new ArrayObject(array('iterator' => TRUE)), // Iterable object should work exactly the same
 		);
 
 		return array(
@@ -258,11 +335,16 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 			array(array(0 => array(0 => 2)), $array, 'users.*.interests.*.length'),
 			// See what happens when it can't dig any deeper from a wildcard
 			array(NULL, $array, 'users.*.fans'),
+			// Starting wildcards, issue #3269
+			array(array('matt', 'john'), $array['users'], '*.name'),
+			// Path as array, issue #3260
+			array($array['users'][2]['name'], $array, array('users', 2, 'name')),
+			array($array['object']['iterator'], $array, 'object.iterator'),
 		);
 	}
 
 	/**
-	 * Tests Arr::get()
+	 * Tests Arr::path()
 	 *
 	 * @test
 	 * @dataProvider provider_path
@@ -277,6 +359,42 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 			$expected,
 			Arr::path($array, $path, $default, $delimiter)
 		);
+	}
+
+	/**
+	 * Provides test data for test_path()
+	 *
+	 * @return array
+	 */
+	public function provider_set_path()
+	{
+		return array(
+			// Tests returns normal values
+			array(array('foo' => 'bar'), array(), 'foo', 'bar'),
+			array(array('kohana' => array('is' => 'awesome')), array(), 'kohana.is', 'awesome'),
+			array(array('kohana' => array('is' => 'cool', 'and' => 'slow')),
+				  array('kohana' => array('is' => 'cool')), 'kohana.and', 'slow'),
+			// Custom delimiters
+			array(array('kohana' => array('is' => 'awesome')), array(), 'kohana/is', 'awesome', '/'),
+			// Ensures set_path() casts ints to actual integers for keys
+			array(array('foo' => array('bar')), array('foo' => array('test')), 'foo.0', 'bar'),
+		);
+	}
+
+	/**
+	 * Tests Arr::path()
+	 *
+	 * @test
+	 * @dataProvider provider_set_path
+	 * @param string  $path       The path to follow
+	 * @param boolean $expected   The expected value
+	 * @param string  $delimiter  The path delimiter
+	 */
+	public function test_set_path($expected, $array, $path, $value, $delimiter = NULL)
+	{
+		Arr::set_path($array, $path, $value, $delimiter);
+
+		$this->assertSame($expected, $array);
 	}
 
 	/**
@@ -384,31 +502,6 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 	}
 
 	/**
-	 * Provides test data for test_binary_search
-	 *
-	 * @return array Test Data
-	 */
-	public function provider_binary_search()
-	{
-		return array(
-			array(2, 'john', array('mary', 'louise', 'john', 'kent'))
-		);
-	}
-
-	/**
-	 *
-	 * @test
-	 * @dataProvider provider_binary_search
-	 */
-	public function test_binary_search($expected, $needle, $haystack, $sort = FALSE)
-	{
-		$this->assertSame(
-			$expected,
-			Arr::binary_search($needle, $haystack, $sort)
-		);
-	}
-
-	/**
 	 * Provides test data for test_map
 	 *
 	 * @return array Test Data
@@ -416,8 +509,47 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 	public function provider_map()
 	{
 		return array(
-			array('strip_tags', array('<p>foobar</p>'), array('foobar')),
-			array('strip_tags', array(array('<p>foobar</p>'), array('<p>foobar</p>')), array(array('foobar'), array('foobar'))),
+			array('strip_tags', array('<p>foobar</p>'), NULL, array('foobar')),
+			array('strip_tags', array(array('<p>foobar</p>'), array('<p>foobar</p>')), NULL, array(array('foobar'), array('foobar'))),
+			array(
+				'strip_tags',
+				array(
+					'foo' => '<p>foobar</p>',
+					'bar' => '<p>foobar</p>',
+				),
+				NULL,
+				array(
+					'foo' => 'foobar',
+					'bar' => 'foobar',
+				),
+			),
+			array(
+				'strip_tags',
+				array(
+					'foo' => '<p>foobar</p>',
+					'bar' => '<p>foobar</p>',
+				),
+				array('foo'),
+				array(
+					'foo' => 'foobar',
+					'bar' => '<p>foobar</p>',
+				),
+			),
+			array(
+				array(
+					'strip_tags',
+					'trim',
+				),
+				array(
+					'foo' => '<p>foobar </p>',
+					'bar' => '<p>foobar</p>',
+				),
+				NULL,
+				array(
+					'foo' => 'foobar',
+					'bar' => 'foobar',
+				),
+			),
 		);
 	}
 
@@ -426,11 +558,11 @@ Class Kohana_ArrTest extends Kohana_Unittest_TestCase
 	 * @test
 	 * @dataProvider provider_map
 	 */
-	public function test_map($method, $source, $expected)
+	public function test_map($method, $source, $keys, $expected)
 	{
 		$this->assertSame(
 			$expected,
-			Arr::map($method, $source)
+			Arr::map($method, $source, $keys)
 		);
 	}
 

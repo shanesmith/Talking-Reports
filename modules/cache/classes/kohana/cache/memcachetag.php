@@ -2,29 +2,29 @@
 /**
  * See [Kohana_Cache_Memcache]
  * 
-* @package    Kohana
-* @category   Cache
+* @package    Kohana/Cache
+* @category   Base
 * @version    2.0
 * @author     Kohana Team
 * @copyright  (c) 2009-2010 Kohana Team
 * @license    http://kohanaphp.com/license
  */
-class Kohana_Cache_MemcacheTag extends Cache_Memcache implements Kohana_Cache_Tagging {
+class Kohana_Cache_MemcacheTag extends Cache_Memcache implements Cache_Tagging {
 
-	/**
+	/** 
 	 * Constructs the memcache object
 	 *
 	 * @param  array     configuration
-	 * @throws  Kohana_Cache_Exception
+	 * @throws  Cache_Exception
 	 */
 	protected function __construct(array $config)
 	{
+		parent::__construct($config);
+
 		if ( ! method_exists($this->_memcache, 'tag_add'))
 		{
-			throw new Kohana_Cache_Exception('Memcached-tags PHP plugin not present. Please see http://code.google.com/p/memcached-tags/ for more information');
+			throw new Cache_Exception('Memcached-tags PHP plugin not present. Please see http://code.google.com/p/memcached-tags/ for more information');
 		}
-
-		parent::__construct($config);
 	}
 
 	/**
@@ -38,6 +38,8 @@ class Kohana_Cache_MemcacheTag extends Cache_Memcache implements Kohana_Cache_Ta
 	 */
 	public function set_with_tags($id, $data, $lifetime = NULL, array $tags = NULL)
 	{
+		$id = $this->_sanitize_id($id);
+
 		$result = $this->set($id, $data, $lifetime);
 
 		if ($result and $tags)
@@ -67,10 +69,10 @@ class Kohana_Cache_MemcacheTag extends Cache_Memcache implements Kohana_Cache_Ta
 	 *
 	 * @param   string   tag 
 	 * @return  void
-	 * @throws  Kohana_Cache_Exception
+	 * @throws  Cache_Exception
 	 */
 	public function find($tag)
 	{
-		throw new Kohana_Cache_Exception('Memcached-tags does not support finding by tag');
+		throw new Cache_Exception('Memcached-tags does not support finding by tag');
 	}	
 }

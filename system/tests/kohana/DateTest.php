@@ -2,17 +2,43 @@
 
 /**
  * Tests Date class
- * 
- * @group kohana
  *
- * @package    Unittest
+ * @group kohana
+ * @group kohana.date
+ *
+ * @package    Kohana
+ * @category   Tests
  * @author     Kohana Team
  * @author     BRMatt <matthew@sigswitch.com>
- * @copyright  (c) 2008-2009 Kohana Team
- * @license    http://kohanaphp.com/license
+ * @copyright  (c) 2008-2011 Kohana Team
+ * @license    http://kohanaframework.org/license
  */
-Class Kohana_DateTest extends Kohana_Unittest_TestCase
+class Kohana_DateTest extends Unittest_TestCase
 {
+	protected $_original_timezone = NULL;
+
+	/**
+	 * Ensures we have a consistant timezone for testing.
+	 */
+	public function setUp()
+	{
+		parent::setUp();
+
+		$this->_original_timezone = date_default_timezone_get();
+
+		date_default_timezone_set('America/Chicago');
+	}
+
+	/**
+	 * Restores original timezone after testing.
+	 */
+	public function tearDown()
+	{
+		date_default_timezone_set($this->_original_timezone);
+
+		parent::tearDown();
+	}
+
 	/**
 	 * Provides test data for test_offset()
 	 *
@@ -21,11 +47,7 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 	public function provider_offset()
 	{
 		return array(
-			array(
-				-18000,
-				'America/Chicago',
-				'GMT',
-			),
+			array(30600, 'Asia/Calcutta', 'America/Argentina/Buenos_Aires'),
 		);
 	}
 
@@ -88,7 +110,7 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 
 	/**
 	 * Tests Date::ampm()
-	 * 
+	 *
 	 * @test
 	 * @covers Date::ampm
 	 * @dataProvider provider_am_pm
@@ -205,11 +227,11 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 		);
 
 		// This should be a mirrored array, days => days
-		for($i = 1; $i <= $expected; ++$i)
+		for ($i = 1; $i <= $expected; ++$i)
 		{
 			$this->assertArrayHasKey($i, $days);
 			// Combining the type check into this saves about 400-500 assertions!
-			$this->assertSame((string) $i, $days[$i]);
+			$this->assertSame( (string) $i, $days[$i]);
 		}
 	}
 
@@ -248,22 +270,98 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 	}
 
 	/**
-	 * Tests Date::months()
-	 * 
+	 * Provider for test_months()
+	 *
+	 * @return array Test data
+	 */
+	public function provider_months()
+	{
+		return array(
+			array(
+				array(
+					1 => "1",
+					2 => "2",
+					3 => "3",
+					4 => "4",
+					5 => "5",
+					6 => "6",
+					7 => "7",
+					8 => "8",
+					9 => "9",
+					10 => "10",
+					11 => "11",
+					12 => "12"
+				),
+				NULL
+			),
+			array(
+				array(
+					1 => "1",
+					2 => "2",
+					3 => "3",
+					4 => "4",
+					5 => "5",
+					6 => "6",
+					7 => "7",
+					8 => "8",
+					9 => "9",
+					10 => "10",
+					11 => "11",
+					12 => "12"
+				),
+				'Guinness'
+			),
+			array(
+				array(
+					1 => "January",
+					2 => "February",
+					3 => "March",
+					4 => "April",
+					5 => "May",
+					6 => "June",
+					7 => "July",
+					8 => "August",
+					9 => "September",
+					10 => "October",
+					11 => "November",
+					12 => "December"
+				),
+				Date::MONTHS_LONG
+			),
+			array(
+				array(
+					1 => "Jan",
+					2 => "Feb",
+					3 => "Mar",
+					4 => "Apr",
+					5 => "May",
+					6 => "Jun",
+					7 => "Jul",
+					8 => "Aug",
+					9 => "Sep",
+					10 => "Oct",
+					11 => "Nov",
+					12 => "Dec"
+				),
+				Date::MONTHS_SHORT
+			)
+
+		);
+	}
+
+	/**
+	 * Date::months() should allow the user to specify different format types, defaulting
+	 * to a mirrored month number => month number array if format is NULL or unrecognised
+	 *
 	 * @test
+	 * @dataProvider provider_months
 	 * @covers Date::months
 	 */
-	public function test_months()
+	public function test_months($expected, $format)
 	{
-		$months = Date::months();
+		$months = Date::months($format);
 
-		$this->assertSame(12, count($months));
-
-		for($i = 1; $i <= 12; ++$i)
-		{
-			$this->assertArrayHasKey($i, $months);
-			$this->assertSame((string) $i, $months[$i]);
-		}
+		$this->assertSame($expected, $months);
 	}
 
 	/**
@@ -340,75 +438,77 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 
 	/**
 	 * Provides test data to test_fuzzy_span
-	 * 
+	 *
 	 * This test data is provided on the assumption that it
-	 * won't take phpunit more than 30 seconds to get the 
+	 * won't take phpunit more than 30 seconds to get the
 	 * data from this provider to the test... ;)
 	 *
 	 * @return array Test Data
 	 */
 	public function provider_fuzzy_span()
 	{
+		$now = time();
+
 		return array(
-			array('moments ago', time() - 30),
-			array('in moments', time() + 30),
+			array('moments ago', $now - 30, $now),
+			array('in moments', $now + 30, $now),
 
-			array('a few minutes ago', time() - 10*60),
-			array('in a few minutes', time() + 10*60),
+			array('a few minutes ago', $now - 10*60, $now),
+			array('in a few minutes', $now + 10*60, $now),
 
-			array('less than an hour ago', time() - 45*60),
-			array('in less than an hour', time() + 45*60),
+			array('less than an hour ago', $now - 45*60, $now),
+			array('in less than an hour', $now + 45*60, $now),
 
-			array('a couple of hours ago', time() - 2*60*60),
-			array('in a couple of hours', time() + 2*60*60),
+			array('a couple of hours ago', $now - 2*60*60, $now),
+			array('in a couple of hours', $now + 2*60*60, $now),
 
-			array('less than a day ago', time() - 12*60*60),
-			array('in less than a day', time() + 12*60*60),
+			array('less than a day ago', $now - 12*60*60, $now),
+			array('in less than a day', $now + 12*60*60, $now),
 
-			array('about a day ago', time() - 30*60*60),	
-			array('in about a day', time() + 30*60*60),	
+			array('about a day ago', $now - 30*60*60, $now),
+			array('in about a day', $now + 30*60*60, $now),
 
-			array('a couple of days ago', time() - 3*24*60*60),
-			array('in a couple of days', time() + 3*24*60*60),
+			array('a couple of days ago', $now - 3*24*60*60, $now),
+			array('in a couple of days', $now + 3*24*60*60, $now),
 
-			array('less than a week ago', time() - 5*24*60*60),
-			array('in less than a week', time() + 5*24*60*60),
+			array('less than a week ago', $now - 5*24*60*60, $now),
+			array('in less than a week', $now + 5*24*60*60, $now),
 
-			array('about a week ago', time() - 9*24*60*60),
-			array('in about a week', time() + 9*24*60*60),
+			array('about a week ago', $now - 9*24*60*60, $now),
+			array('in about a week', $now + 9*24*60*60, $now),
 
-			array('less than a month ago', time() - 20*24*60*60),
-			array('in less than a month', time() + 20*24*60*60),
+			array('less than a month ago', $now - 20*24*60*60, $now),
+			array('in less than a month', $now + 20*24*60*60, $now),
 
-			array('about a month ago', time() - 40*24*60*60),
-			array('in about a month', time() + 40*24*60*60),
+			array('about a month ago', $now - 40*24*60*60, $now),
+			array('in about a month', $now + 40*24*60*60, $now),
 
-			array('a couple of months ago', time() - 3*30*24*60*60),
-			array('in a couple of months', time() + 3*30*24*60*60),
+			array('a couple of months ago', $now - 3*30*24*60*60, $now),
+			array('in a couple of months', $now + 3*30*24*60*60, $now),
 
-			array('less than a year ago', time() - 7*31*24*60*60),
-			array('in less than a year', time() + 7*31*24*60*60),
+			array('less than a year ago', $now - 7*31*24*60*60, $now),
+			array('in less than a year', $now + 7*31*24*60*60, $now),
 
-			array('about a year ago', time() - 18*31*24*60*60),
-			array('in about a year', time() + 18*31*24*60*60),
+			array('about a year ago', $now - 18*31*24*60*60, $now),
+			array('in about a year', $now + 18*31*24*60*60, $now),
 
-			array('a couple of years ago', time() - 3*12*31*24*60*60),
-			array('in a couple of years', time() + 3*12*31*24*60*60),
+			array('a couple of years ago', $now - 3*12*31*24*60*60, $now),
+			array('in a couple of years', $now + 3*12*31*24*60*60, $now),
 
-			array('a few years ago', time() - 5*12*31*24*60*60),
-			array('in a few years', time() + 5*12*31*24*60*60),
+			array('a few years ago', $now - 5*12*31*24*60*60, $now),
+			array('in a few years', $now + 5*12*31*24*60*60, $now),
 
-			array('about a decade ago', time() - 11*12*31*24*60*60),
-			array('in about a decade', time() + 11*12*31*24*60*60),
+			array('about a decade ago', $now - 11*12*31*24*60*60, $now),
+			array('in about a decade', $now + 11*12*31*24*60*60, $now),
 
-			array('a couple of decades ago', time() - 20*12*31*24*60*60),
-			array('in a couple of decades', time() + 20*12*31*24*60*60),
+			array('a couple of decades ago', $now - 20*12*31*24*60*60, $now),
+			array('in a couple of decades', $now + 20*12*31*24*60*60, $now),
 
-			array('several decades ago', time() - 50*12*31*24*60*60),
-			array('in several decades', time() + 50*12*31*24*60*60),
+			array('several decades ago', $now - 50*12*31*24*60*60, $now),
+			array('in several decades', $now + 50*12*31*24*60*60, $now),
 
-			array('a long time ago', time() - pow(10,10)),
-			array('in a long time', time() + pow(10,10)),
+			array('a long time ago', $now - pow(10,10), $now),
+			array('in a long time', $now + pow(10,10), $now),
 		);
 	}
 
@@ -417,18 +517,19 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 	 *
 	 * @test
 	 * @dataProvider provider_fuzzy_span
-	 * @param string $expected Expected output
-	 * @param integer $timestamp Timestamp to use
+	 * @param string  $expected        Expected output
+	 * @param integer $timestamp       Timestamp to use
+	 * @param integer $local_timestamp The local timestamp to use
 	 */
-	public function test_fuzzy_span($expected, $timestamp)
+	public function test_fuzzy_span($expected, $timestamp, $local_timestamp)
 	{
 		$this->assertSame(
 			$expected,
-			Date::fuzzy_span($timestamp)
+			Date::fuzzy_span($timestamp, $local_timestamp)
 		);
 	}
 
-	/** 
+	/**
 	 * Provides test data for test_years()
 	 *
 	 * @return array Test Data
@@ -438,15 +539,15 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 		return array(
 			array(
 				array (
-					2005 => '2005', 
-					2006 => '2006', 
+					2005 => '2005',
+					2006 => '2006',
 					2007 => '2007',
 				    2008 => '2008',
 				    2009 => '2009',
 				    2010 => '2010',
 				    2011 => '2011',
 				    2012 => '2012',
-					2013 => '2013', 
+					2013 => '2013',
 					2014 => '2014',
 					2015 => '2015',
 				),
@@ -498,7 +599,7 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 	 * @test
 	 * @dataProvider provider_hours
 	 */
-	public function test_hours($expected, $step = 1, $long = FALSE, $start = NULL) 
+	public function test_hours($expected, $step = 1, $long = FALSE, $start = NULL)
 	{
 		$this->assertSame(
 			$expected,
@@ -516,19 +617,19 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 		return array(
 			array(
 				// Thank god for var_export()
-				array ( 
-					0 => '00', 1 => '01', 2 => '02', 3 => '03', 4 => '04', 
-					5 => '05', 6 => '06', 7 => '07', 8 => '08', 9 => '09', 
-					10 => '10', 11 => '11', 12 => '12', 13 => '13', 14 => '14', 
-					15 => '15', 16 => '16', 17 => '17', 18 => '18', 19 => '19', 
-					20 => '20', 21 => '21', 22 => '22', 23 => '23', 24 => '24', 
-					25 => '25', 26 => '26', 27 => '27', 28 => '28', 29 => '29', 
-					30 => '30', 31 => '31', 32 => '32', 33 => '33', 34 => '34', 
-					35 => '35', 36 => '36', 37 => '37', 38 => '38', 39 => '39', 
-					40 => '40', 41 => '41', 42 => '42', 43 => '43', 44 => '44', 
-					45 => '45', 46 => '46', 47 => '47', 48 => '48', 49 => '49', 
-					50 => '50', 51 => '51', 52 => '52', 53 => '53', 54 => '54', 
-					55 => '55', 56 => '56', 57 => '57', 58 => '58', 59 => '59', 
+				array (
+					0 => '00', 1 => '01', 2 => '02', 3 => '03', 4 => '04',
+					5 => '05', 6 => '06', 7 => '07', 8 => '08', 9 => '09',
+					10 => '10', 11 => '11', 12 => '12', 13 => '13', 14 => '14',
+					15 => '15', 16 => '16', 17 => '17', 18 => '18', 19 => '19',
+					20 => '20', 21 => '21', 22 => '22', 23 => '23', 24 => '24',
+					25 => '25', 26 => '26', 27 => '27', 28 => '28', 29 => '29',
+					30 => '30', 31 => '31', 32 => '32', 33 => '33', 34 => '34',
+					35 => '35', 36 => '36', 37 => '37', 38 => '38', 39 => '39',
+					40 => '40', 41 => '41', 42 => '42', 43 => '43', 44 => '44',
+					45 => '45', 46 => '46', 47 => '47', 48 => '48', 49 => '49',
+					50 => '50', 51 => '51', 52 => '52', 53 => '53', 54 => '54',
+					55 => '55', 56 => '56', 57 => '57', 58 => '58', 59 => '59',
 				),
 				1,
 				0,
@@ -560,14 +661,14 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 	{
 		return array(
 			array(
-				array( 
-					0 => '00', 5 => '05', 10 => '10', 
-					15 => '15', 20 => '20', 25 => '25', 
-					30 => '30', 35 => '35', 40 => '40', 
-					45 => '45', 50 => '50', 55 => '55', 
+				array(
+					0 => '00', 5 => '05', 10 => '10',
+					15 => '15', 20 => '20', 25 => '25',
+					30 => '30', 35 => '35', 40 => '40',
+					45 => '45', 50 => '50', 55 => '55',
 				),
 				5,
-			),		
+			),
 		);
 	}
 
@@ -593,11 +694,11 @@ Class Kohana_DateTest extends Kohana_Unittest_TestCase
 	 */
 	public function test_minutes_defaults_to_using_step_of5()
 	{
-		$minutes = array( 
-			0 => '00', 5 => '05', 10 => '10', 
-			15 => '15', 20 => '20', 25 => '25', 
-			30 => '30', 35 => '35', 40 => '40', 
-			45 => '45', 50 => '50', 55 => '55', 
+		$minutes = array(
+			0 => '00', 5 => '05', 10 => '10',
+			15 => '15', 20 => '20', 25 => '25',
+			30 => '30', 35 => '35', 40 => '40',
+			45 => '45', 50 => '50', 55 => '55',
 		);
 
 		$this->assertSame(

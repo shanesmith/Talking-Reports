@@ -30,26 +30,26 @@
  * *  PHP 5.2.4 or greater
  * *  APC PHP extension
  * 
- * @package    Kohana
- * @category   Cache
+ * @package    Kohana/Cache
+ * @category   Base
  * @author     Kohana Team
  * @copyright  (c) 2009-2010 Kohana Team
  * @license    http://kohanaphp.com/license
  */
-class Kohana_Cache_Apc extends Cache {
+class Kohana_Cache_Apc extends Cache implements Cache_Arithmetic {
 
 	/**
 	 * Check for existence of the APC extension This method cannot be invoked externally. The driver must
 	 * be instantiated using the `Cache::instance()` method.
 	 *
 	 * @param  array     configuration
-	 * @throws Kohana_Cache_Exception
+	 * @throws Cache_Exception
 	 */
 	protected function __construct(array $config)
 	{
 		if ( ! extension_loaded('apc'))
 		{
-			throw new Kohana_Cache_Exception('PHP APC extension is not available.');
+			throw new Cache_Exception('PHP APC extension is not available.');
 		}
 
 		parent::__construct($config);
@@ -67,11 +67,13 @@ class Kohana_Cache_Apc extends Cache {
 	 * @param   string   id of cache to entry
 	 * @param   string   default value to return if cache miss
 	 * @return  mixed
-	 * @throws  Kohana_Cache_Exception
+	 * @throws  Cache_Exception
 	 */
 	public function get($id, $default = NULL)
 	{
-		return (($data = apc_fetch($this->_sanitize_id($id))) === FALSE) ? $default : $data;
+		$data = apc_fetch($this->_sanitize_id($id), $success);
+
+		return $success ? $data : $default;
 	}
 
 	/**
@@ -130,4 +132,35 @@ class Kohana_Cache_Apc extends Cache {
 	{
 		return apc_clear_cache('user');
 	}
-}
+
+	/**
+	 * Increments a given value by the step value supplied.
+	 * Useful for shared counters and other persistent integer based
+	 * tracking.
+	 *
+	 * @param   string    id of cache entry to increment
+	 * @param   int       step value to increment by
+	 * @return  integer
+	 * @return  boolean
+	 */
+	public function increment($id, $step = 1)
+	{
+		return apc_inc($id, $step);
+	}
+
+	/**
+	 * Decrements a given value by the step value supplied.
+	 * Useful for shared counters and other persistent integer based
+	 * tracking.
+	 *
+	 * @param   string    id of cache entry to decrement
+	 * @param   int       step value to decrement by
+	 * @return  integer
+	 * @return  boolean
+	 */
+	public function decrement($id, $step = 1)
+	{
+		return apc_dec($id, $step);
+	}
+
+} // End Kohana_Cache_Apc

@@ -8,9 +8,9 @@ Route::set('docs/media', 'guide/media(/<file>)', array('file' => '.+'))
 		'file'       => NULL,
 	));
 
-if (Kohana::config('userguide.api_browser') === TRUE)
+// API Browser, if enabled
+if (Kohana::$config->load('userguide.api_browser') === TRUE)
 {
-	// API Browser
 	Route::set('docs/api', 'guide/api(/<class>)', array('class' => '[a-zA-Z0-9_]+'))
 		->defaults(array(
 			'controller' => 'userguide',
@@ -19,12 +19,26 @@ if (Kohana::config('userguide.api_browser') === TRUE)
 		));
 }
 
-// Translated user guide
-Route::set('docs/guide', 'guide(/<page>)', array(
+// User guide pages, in modules
+Route::set('docs/guide', 'guide(/<module>(/<page>))', array(
 		'page' => '.+',
 	))
 	->defaults(array(
 		'controller' => 'userguide',
 		'action'     => 'docs',
+		'module'     => '',
 	));
 
+// Simple autoloader used to encourage PHPUnit to behave itself.
+class Markdown_Autoloader {
+	public static function autoload($class)
+	{
+		if ($class == 'Markdown_Parser' OR $class == 'MarkdownExtra_Parser')
+		{
+			include_once Kohana::find_file('vendor', 'markdown/markdown');
+		}
+	}
+}
+
+// Register the autoloader
+spl_autoload_register(array('Markdown_Autoloader', 'autoload'));

@@ -3,8 +3,16 @@
 // Sanity check, install should only be checked from index.php
 defined('SYSPATH') or exit('Install tests must be loaded from within index.php!');
 
-// Clear out the cache to prevent errors. This typically happens on Windows/FastCGI.
-clearstatcache(TRUE);
+if (version_compare(PHP_VERSION, '5.3', '<'))
+{
+	// Clear out the cache to prevent errors. This typically happens on Windows/FastCGI.
+	clearstatcache();
+}
+else
+{
+	// Clearing the realpath() cache is only possible PHP 5.3+
+	clearstatcache(TRUE);
+}
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -172,11 +180,19 @@ clearstatcache(TRUE);
 
 	<table cellspacing="0">
 		<tr>
+			<th>PECL HTTP Enabled</th>
+			<?php if (extension_loaded('http')): ?>
+				<td class="pass">Pass</td>
+			<?php else: ?>
+				<td class="fail">Kohana can use the <a href="http://php.net/http">http</a> extension for the Request_Client_External class.</td>
+			<?php endif ?>
+		</tr>
+		<tr>
 			<th>cURL Enabled</th>
 			<?php if (extension_loaded('curl')): ?>
 				<td class="pass">Pass</td>
 			<?php else: ?>
-				<td class="fail">Kohana requires <a href="http://php.net/curl">cURL</a> for the Remote class.</td>
+				<td class="fail">Kohana can use the <a href="http://php.net/curl">cURL</a> extension for the Request_Client_External class.</td>
 			<?php endif ?>
 		</tr>
 		<tr>
@@ -193,6 +209,14 @@ clearstatcache(TRUE);
 				<td class="pass">Pass</td>
 			<?php else: ?>
 				<td class="fail">Kohana requires <a href="http://php.net/gd">GD</a> v2 for the Image class.</td>
+			<?php endif ?>
+		</tr>
+		<tr>
+			<th>MySQL Enabled</th>
+			<?php if (function_exists('mysql_connect')): ?>
+				<td class="pass">Pass</td>
+			<?php else: ?>
+				<td class="fail">Kohana can use the <a href="http://php.net/mysql">MySQL</a> extension to support MySQL databases.</td>
 			<?php endif ?>
 		</tr>
 		<tr>

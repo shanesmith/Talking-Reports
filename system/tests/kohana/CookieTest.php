@@ -4,15 +4,39 @@
  * Tests the cookie class
  *
  * @group kohana
+ * @group kohana.cookie
  *
- * @package    Unittest
+ * @package    Kohana
+ * @category   Tests
  * @author     Kohana Team
  * @author     Jeremy Bush <contractfrombelow@gmail.com>
- * @copyright  (c) 2008-2010 Kohana Team
- * @license    http://kohanaphp.com/license
+ * @copyright  (c) 2008-2011 Kohana Team
+ * @license    http://kohanaframework.org/license
  */
-Class Kohana_CookieTest extends Kohana_Unittest_TestCase
+class Kohana_CookieTest extends Unittest_TestCase
 {
+
+	protected $_default_salt = 'AdaoidadnA£ASDNadnaoiwdnawd';
+	/**
+	 * Sets up the environment
+	 */
+	public function setUp()
+	{
+		parent::setUp();
+
+		Cookie::$salt = $this->_default_salt;
+	}
+
+	/**
+	 * Tears down the environment
+	 */
+	public function tearDown()
+	{
+		parent::tearDown();
+
+		Cookie::$salt = NULL;
+	}
+
 	/**
 	 * Provides test data for test_set()
 	 *
@@ -39,6 +63,9 @@ Class Kohana_CookieTest extends Kohana_Unittest_TestCase
 	 */
 	public function test_set($key, $value, $exp, $expected)
 	{
+		if (headers_sent())
+			$this->markTestSkipped('Cannot test setting cookies as headers have already been sent');
+
 		$this->assertSame($expected, cookie::set($key, $value, $exp));
 	}
 
@@ -49,6 +76,10 @@ Class Kohana_CookieTest extends Kohana_Unittest_TestCase
 	 */
 	public function provider_get()
 	{
+		// setUp is called after the provider so we need to specify a
+		// salt here in order to use it in the provider
+		Cookie::$salt = $this->_default_salt;
+
 		return array(
 			array('foo', Cookie::salt('foo', 'bar').'~bar', 'bar'),
 			array('bar', Cookie::salt('foo', 'bar').'~bar', NULL),
@@ -68,9 +99,14 @@ Class Kohana_CookieTest extends Kohana_Unittest_TestCase
 	 */
 	public function test_get($key, $value, $expected)
 	{
+		if (headers_sent())
+			$this->markTestSkipped('Cannot test setting cookies as headers have already been sent');
+
 		// Force $_COOKIE
 		if ($key !== NULL)
+		{
 			$_COOKIE[$key] = $value;
+		}
 
 		$this->assertSame($expected, cookie::get($key));
 	}
@@ -98,6 +134,9 @@ Class Kohana_CookieTest extends Kohana_Unittest_TestCase
 	 */
 	public function test_delete($key, $expected)
 	{
+		if (headers_sent())
+			$this->markTestSkipped('Cannot test setting cookies as headers have already been sent');
+
 		$this->assertSame($expected, cookie::delete($key));
 	}
 
@@ -109,7 +148,7 @@ Class Kohana_CookieTest extends Kohana_Unittest_TestCase
 	public function provider_salt()
 	{
 		return array(
-			array('foo', 'bar', '795317c9df04d8061e6e134a9b3487dc9ad69117'),
+			array('foo', 'bar', 'b5773a6255d1deefc23f9f69bcc40fdc998e5802'),
 		);
 	}
 

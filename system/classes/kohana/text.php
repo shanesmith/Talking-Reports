@@ -1,12 +1,12 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php defined('SYSPATH') or die('No direct script access.');
 /**
  * Text helper class. Provides simple methods for working with text.
  *
  * @package    Kohana
  * @category   Helpers
  * @author     Kohana Team
- * @copyright  (c) 2007-2008 Kohana Team
- * @license    http://kohanaphp.com/license
+ * @copyright  (c) 2007-2011 Kohana Team
+ * @license    http://kohanaframework.org/license
  */
 class Kohana_Text {
 
@@ -72,7 +72,7 @@ class Kohana_Text {
 
 		// Only attach the end character if the matched string is shorter
 		// than the starting string.
-		return rtrim($matches[0]).(strlen($matches[0]) === strlen($str) ? '' : $end_char);
+		return rtrim($matches[0]).((strlen($matches[0]) === strlen($str)) ? '' : $end_char);
 	}
 
 	/**
@@ -107,7 +107,7 @@ class Kohana_Text {
 		if ( ! preg_match('/^.{0,'.$limit.'}\s/us', $str, $matches))
 			return $end_char;
 
-		return rtrim($matches[0]).(strlen($matches[0]) === strlen($str) ? '' : $end_char);
+		return rtrim($matches[0]).((strlen($matches[0]) === strlen($str)) ? '' : $end_char);
 	}
 
 	/**
@@ -233,6 +233,22 @@ class Kohana_Text {
 	}
 
 	/**
+	 * Uppercase words that are not separated by spaces, using a custom
+	 * delimiter or the default.
+	 * 
+	 *      $str = Text::ucfirst('content-type'); // returns "Content-Type" 
+	 *
+	 * @param   string    string to transform
+	 * @param   string    delemiter to use
+	 * @return  string
+	 */
+	public static function ucfirst($string, $delimiter = '-')
+	{
+		// Put the keys back the Case-Convention expected
+		return implode($delimiter, array_map('ucfirst', explode($delimiter, $string)));
+	}
+
+	/**
 	 * Reduces multiple slashes in a string to single slashes.
 	 *
 	 *     $str = Text::reduce_slashes('foo//bar/baz'); // "foo/bar/baz"
@@ -262,9 +278,9 @@ class Kohana_Text {
 	 */
 	public static function censor($str, $badwords, $replacement = '#', $replace_partial_words = TRUE)
 	{
-		foreach ((array) $badwords as $key => $badword)
+		foreach ( (array) $badwords as $key => $badword)
 		{
-			$badwords[$key] = str_replace('\*', '\S*?', preg_quote((string) $badword));
+			$badwords[$key] = str_replace('\*', '\S*?', preg_quote( (string) $badword));
 		}
 
 		$regex = '('.implode('|', $badwords).')';
@@ -346,7 +362,7 @@ class Kohana_Text {
 	public static function auto_link_urls($text)
 	{
 		// Find and replace all http/https/ftp/ftps links that are not part of an existing html anchor
-		$text = preg_replace_callback('~\b(?<!href="|">)(?:ht|f)tps?://\S+(?:/|\b)~i', 'Text::_auto_link_urls_callback1', $text);
+		$text = preg_replace_callback('~\b(?<!href="|">)(?:ht|f)tps?://[^<\s]+(?:/|\b)~i', 'Text::_auto_link_urls_callback1', $text);
 
 		// Find and replace all naked www.links.com (without http://)
 		return preg_replace_callback('~\b(?<!://|">)www(?:\.[a-z0-9][-a-z0-9]*+)+\.[a-z]{2,6}\b~i', 'Text::_auto_link_urls_callback2', $text);
@@ -476,7 +492,7 @@ class Kohana_Text {
 		}
 
 		// Determine unit to use
-		if (($power = array_search((string) $force_unit, $units)) === FALSE)
+		if (($power = array_search( (string) $force_unit, $units)) === FALSE)
 		{
 			$power = ($bytes > 0) ? floor(log($bytes, $mod)) : 0;
 		}
@@ -538,7 +554,7 @@ class Kohana_Text {
 
 				// In the situation that we need to make a composite number (i.e. twenty-three)
 				// then we need to modify the previous entry
-				if(empty($item))
+				if (empty($item))
 				{
 					array_pop($text);
 
@@ -550,14 +566,14 @@ class Kohana_Text {
 			}
 		}
 
-		if(count($text) > 1)
+		if (count($text) > 1)
 		{
 			$and = array_pop($text);
 		}
 
 		$text = implode(', ', $text);
 
-		if(isset($and))
+		if (isset($and))
 		{
 			$text .= ' and '.$and;
 		}

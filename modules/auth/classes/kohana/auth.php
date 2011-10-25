@@ -5,8 +5,8 @@
  *
  * @package    Kohana/Auth
  * @author     Kohana Team
- * @copyright  (c) 2007-2009 Kohana Team
- * @license    http://kohanaphp.com/license.html
+ * @copyright  (c) 2007-2010 Kohana Team
+ * @license    http://kohanaframework.org/license
  */
 abstract class Kohana_Auth {
 
@@ -23,11 +23,11 @@ abstract class Kohana_Auth {
 		if ( ! isset(Auth::$_instance))
 		{
 			// Load the configuration for this type
-			$config = Kohana::config('auth');
+			$config = Kohana::$config->load('auth');
 
 			if ( ! $type = $config->get('driver'))
 			{
-				$type = 'ORM';
+				$type = 'file';
 			}
 
 			// Set the session class name
@@ -38,16 +38,6 @@ abstract class Kohana_Auth {
 		}
 
 		return Auth::$_instance;
-	}
-
-	/**
-	 * Create an instance of Auth.
-	 *
-	 * @return  Auth
-	 */
-	public static function factory($config = array())
-	{
-		return new Auth($config);
 	}
 
 	protected $_session;
@@ -61,13 +51,10 @@ abstract class Kohana_Auth {
 	 */
 	public function __construct($config = array())
 	{
-		// Clean up the salt pattern and split it into an array
-		$config['salt_pattern'] = preg_split('/,\s*/', Kohana::config('auth')->get('salt_pattern'));
-
 		// Save the config in the object
 		$this->_config = $config;
 
-		$this->_session = Session::instance();
+		$this->_session = Session::instance($this->_config['session_type']);
 	}
 
 	abstract protected function _login($username, $password, $remember);
@@ -78,13 +65,13 @@ abstract class Kohana_Auth {
 
 	/**
 	 * Gets the currently logged in user from the session.
-	 * Returns FALSE if no user is currently logged in.
+	 * Returns NULL if no user is currently logged in.
 	 *
 	 * @return  mixed
 	 */
-	public function get_user()
+	public function get_user($default = NULL)
 	{
-		return $this->_session->get($this->_config['session_key'], FALSE);
+		return $this->_session->get($this->_config['session_key'], $default);
 	}
 
 	/**
@@ -99,15 +86,6 @@ abstract class Kohana_Auth {
 	{
 		if (empty($password))
 			return FALSE;
-
-		if (is_string($password))
-		{
-			// Get the salt from the stored password
-			$salt = $this->find_salt($this->password($username));
-
-			// Create a hashed password using the salt from the stored password
-			$password = $this->hash_password($password, $salt);
-		}
 
 		return $this->_login($username, $password, $remember);
 	}
@@ -141,90 +119,40 @@ abstract class Kohana_Auth {
 
 	/**
 	 * Check if there is an active session. Optionally allows checking for a
-	 * specific role. 
+	 * specific role.
 	 *
 	 * @param   string   role name
 	 * @return  mixed
 	 */
 	public function logged_in($role = NULL)
 	{
-		return FALSE !== $this->get_user();
+		return ($this->get_user() !== NULL);
 	}
 
 	/**
-	 * Creates a hashed password from a plaintext password, inserting salt
-	 * based on the configured salt pattern.
+	 * Creates a hashed hmac password from a plaintext password. This
+	 * method is deprecated, [Auth::hash] should be used instead.
 	 *
+	 * @deprecated
 	 * @param   string  plaintext password
-	 * @return  string  hashed password string
 	 */
-	public function hash_password($password, $salt = FALSE)
+	public function hash_password($password)
 	{
-		if ($salt === FALSE)
-		{
-			// Create a salt seed, same length as the number of offsets in the pattern
-			$salt = substr($this->hash(uniqid(NULL, TRUE)), 0, count($this->_config['salt_pattern']));
-		}
-
-		// Password hash that the salt will be inserted into
-		$hash = $this->hash($salt.$password);
-
-		// Change salt to an array
-		$salt = str_split($salt, 1);
-
-		// Returned password
-		$password = '';
-
-		// Used to calculate the length of splits
-		$last_offset = 0;
-
-		foreach ($this->_config['salt_pattern'] as $offset)
-		{
-			// Split a new part of the hash off
-			$part = substr($hash, 0, $offset - $last_offset);
-
-			// Cut the current part out of the hash
-			$hash = substr($hash, $offset - $last_offset);
-
-			// Add the part to the password, appending the salt character
-			$password .= $part.array_shift($salt);
-
-			// Set the last offset to the current offset
-			$last_offset = $offset;
-		}
-
-		// Return the password, with the remaining hash appended
-		return $password.$hash;
+		return $this->hash($password);
 	}
 
 	/**
-	 * Perform a hash, using the configured method.
+	 * Perform a hmac hash, using the configured method.
 	 *
 	 * @param   string  string to hash
 	 * @return  string
 	 */
 	public function hash($str)
 	{
-		return hash($this->_config['hash_method'], $str);
-	}
+		if ( ! $this->_config['hash_key'])
+			throw new Kohana_Exception('A valid hash key must be set in your auth config.');
 
-	/**
-	 * Finds the salt from a password, based on the configured salt pattern.
-	 *
-	 * @param   string  hashed password
-	 * @return  string
-	 */
-	public function find_salt($password)
-	{
-		$salt = '';
-
-		foreach ($this->_config['salt_pattern'] as $i => $offset)
-		{
-			// Find salt characters, take a good long look...
-			$salt .= substr($password, $offset + $i, 1);
-		}
-
-		return $salt;
+		return hash_hmac($this->_config['hash_method'], $str, $this->_config['hash_key']);
 	}
 
 	protected function complete_login($user)

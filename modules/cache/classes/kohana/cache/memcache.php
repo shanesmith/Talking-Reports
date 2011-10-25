@@ -24,6 +24,7 @@
  *                              'timeout'          => 1,
  *                              'retry_interval'   => 15,
  *                              'status'           => TRUE,
+ *				'instant_death'	   => TRUE,
  *                              'failure_callback' => array('className', 'classMethod')
  *                         ),
  *                         // Second memcache server
@@ -72,14 +73,14 @@
  * *  Memcache (plus Memcached-tags for native tagging support)
  * *  Zlib
  * 
- * @package    Kohana
- * @category   Cache
+ * @package    Kohana/Cache
+ * @category   Base
  * @version    2.0
  * @author     Kohana Team
  * @copyright  (c) 2009-2010 Kohana Team
  * @license    http://kohanaphp.com/license
  */
-class Kohana_Cache_Memcache extends Cache {
+class Kohana_Cache_Memcache extends Cache implements Cache_Arithmetic {
 
 	// Memcache has a maximum cache lifetime of 30 days
 	const CACHE_CEILING = 2592000;
@@ -99,17 +100,24 @@ class Kohana_Cache_Memcache extends Cache {
 	protected $_flags;
 
 	/**
+	 * The default configuration for the memcached server
+	 *
+	 * @var array
+	 */
+	protected $_default_config = array();
+
+	/**
 	 * Constructs the memcache Kohana_Cache object
 	 *
 	 * @param   array     configuration
-	 * @throws  Kohana_Cache_Exception
+	 * @throws  Cache_Exception
 	 */
 	protected function __construct(array $config)
 	{
 		// Check for the memcache extention
 		if ( ! extension_loaded('memcache'))
 		{
-			throw new Kohana_Cache_Exception('Memcache PHP extention not loaded');
+			throw new Cache_Exception('Memcache PHP extention not loaded');
 		}
 
 		parent::__construct($config);
@@ -123,30 +131,31 @@ class Kohana_Cache_Memcache extends Cache {
 		if ( ! $servers)
 		{
 			// Throw an exception if no server found
-			throw new Kohana_Cache_Exception('No Memcache servers defined in configuration');
+			throw new Cache_Exception('No Memcache servers defined in configuration');
 		}
 
 		// Setup default server configuration
-		$config = array(
-			'host'             => 'localhost',
-			'port'             => 11211,
-			'persistent'       => FALSE,
-			'weight'           => 1,
-			'timeout'          => 1,
-			'retry_interval'   => 15,
-			'status'           => TRUE,
-			'failure_callback' => array($this, '_failed_request'),
+		$this->_default_config = array(
+				'host'             => 'localhost',
+				'port'             => 11211,
+				'persistent'       => FALSE,
+				'weight'           => 1,
+				'timeout'          => 1,
+				'retry_interval'   => 15,
+				'status'           => TRUE,
+				'instant_death'	   => TRUE,
+				'failure_callback' => array($this, '_failed_request'),
 		);
 
 		// Add the memcache servers to the pool
 		foreach ($servers as $server)
 		{
 			// Merge the defined config with defaults
-			$server += $config;
+			$server += $this->_default_config;
 
 			if ( ! $this->_memcache->addServer($server['host'], $server['port'], $server['persistent'], $server['weight'], $server['timeout'], $server['retry_interval'], $server['status'], $server['failure_callback']))
 			{
-				throw new Kohana_Cache_Exception('Memcache could not connect to host \':host\' using port \':port\'', array(':host' => $server['host'], ':port' => $server['port']));
+				throw new Cache_Exception('Memcache could not connect to host \':host\' using port \':port\'', array(':host' => $server['host'], ':port' => $server['port']));
 			}
 		}
 
@@ -166,7 +175,7 @@ class Kohana_Cache_Memcache extends Cache {
 	 * @param   string   id of cache to entry
 	 * @param   string   default value to return if cache miss
 	 * @return  mixed
-	 * @throws  Kohana_Cache_Exception
+	 * @throws  Cache_Exception
 	 */
 	public function get($id, $default = NULL)
 	{
@@ -276,7 +285,7 @@ class Kohana_Cache_Memcache extends Cache {
 	 * @return  void|boolean
 	 * @since   3.0.8
 	 */
-	protected function _failed_request($hostname, $port)
+	public function _failed_request($hostname, $port)
 	{
 		if ( ! $this->_config['instant_death'])
 			return; 
@@ -287,8 +296,12 @@ class Kohana_Cache_Memcache extends Cache {
 		// Get host settings from configuration
 		foreach ($this->_config['servers'] as $server)
 		{
+			// Merge the defaults, since they won't always be set
+			$server += $this->_default_config;
+			// We're looking at the failed server
 			if ($hostname == $server['host'] and $port == $server['port'])
 			{
+				// Server to disable, since it failed
 				$host = $server;
 				continue;
 			}
@@ -303,9 +316,39 @@ class Kohana_Cache_Memcache extends Cache {
 				$host['port'],
 				$host['timeout'],
 				$host['retry_interval'],
-				FALSE,
+				FALSE, // Server is offline
 				array($this, '_failed_request'
 				));
 		}
+	}
+
+	/**
+	 * Increments a given value by the step value supplied.
+	 * Useful for shared counters and other persistent integer based
+	 * tracking.
+	 *
+	 * @param   string    id of cache entry to increment
+	 * @param   int       step value to increment by
+	 * @return  integer
+	 * @return  boolean
+	 */
+	public function increment($id, $step = 1)
+	{
+		return $this->_memcache->increment($id, $step);
+	}
+
+	/**
+	 * Decrements a given value by the step value supplied.
+	 * Useful for shared counters and other persistent integer based
+	 * tracking.
+	 *
+	 * @param   string    id of cache entry to decrement
+	 * @param   int       step value to decrement by
+	 * @return  integer
+	 * @return  boolean
+	 */
+	public function decrement($id, $step = 1)
+	{
+		return $this->_memcache->decrement($id, $step);
 	}
 }

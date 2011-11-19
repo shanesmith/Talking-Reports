@@ -145,7 +145,7 @@ class Controller_App extends Controller_Master {
 			$grand_total += $total_price;
 		}
 
-		echo $grand_total;
+		return $grand_total;
 
 	}
 

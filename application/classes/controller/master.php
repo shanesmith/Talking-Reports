@@ -1,5 +1,5 @@
 <?php
-require Kohana::find_file('vendor', 'twilio/twilio');
+require Kohana::find_file('vendor', 'twilio/Twilio');
 
 require Kohana::find_file('vendor', 'shopify/lib/shopify_api', 'php');
 

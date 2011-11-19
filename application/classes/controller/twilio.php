@@ -69,6 +69,12 @@ class Controller_Twilio extends Controller {
 
 	public function action_feed() {
 
+		$session = Session::instance();
+
+		if (!$session->get('last-order-id')) {
+			$session-set('last-order-id', Controller_App::get_last_order_id());
+		}
+
 		if ($this->request->post('Digits')) {
 
 			if ($this->request->post('Digits') == '6') {
@@ -83,9 +89,13 @@ class Controller_Twilio extends Controller {
 
 			$gather = $this->twiml->gather(array('numDigits' => 1, 'timeout' => 3));
 
-			if (rand(1,2) == 5) {
-				$gather->say("Cha-Ching!");
-			}
+			$count = Controller_App::get_orders_since($session->get('last-order-id'));
+
+			//if ($count != 0) {
+				$last_order_id = Controller_App::get_last_order_id();
+				$gather->say($count . " new order! " + $last_order_id);
+				$session->set('last-order-id', $last_order_id);
+			//}
 
 			$this->redirect("feed");
 

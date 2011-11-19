@@ -78,17 +78,6 @@ class Controller_App extends Controller_Master {
 		$shopify = shopify_api_client($shop, $token, $key, $secret);
 
 		try {
-			//Daily count of orders
-			$order_count = Controller_App::get_daily_orders_count();
-			exit();
-
-			//Daily count of open orders
-			$open_orders_count = $this->_get_daily_orders_count('status', 'open');
-
-			//Daily count of closed orders
-			$closed_orders_count = $this->_get_daily_orders_count('status', 'closed');
-			//print_r($closed_orders_count);
-
 			//Daily orders
 			$daily_orders = $this->_get_daily_orders();
 
@@ -99,11 +88,29 @@ class Controller_App extends Controller_Master {
 				$price = $order['line_items'][0]['price'];
 				$total_before_tax = $order['total_line_items_price'];
 				$total_price = $order['total_price'];
+				$id = $order['id'];
+
+				//echo Controller_App::get_orders_since($id);
+				//echo '<br />';
 
 				$grand_total += $total_price;
 			}
 
-			echo $grand_total;
+			//echo $grand_total;
+
+			
+			//Daily count of orders
+			//$order_count = Controller_App::get_daily_orders_count();
+			$last_order = Controller_App::get_last_order_id();
+			echo $last_order;
+			exit();
+
+			//Daily count of open orders
+			$open_orders_count = $this->_get_daily_orders_count('status', 'open');
+
+			//Daily count of closed orders
+			$closed_orders_count = $this->_get_daily_orders_count('status', 'closed');
+			//print_r($closed_orders_count);
 
 			//Get products
 			$products = $shopify('GET', '/admin/products.json', array('published_status' => 'published'));
@@ -154,18 +161,63 @@ class Controller_App extends Controller_Master {
 		}
 	}
 
-	public static function get_daily_orders_count($method = '', $param = ''){
+	public static function get_last_order_id(){
 		$session = Session::instance()->as_array();
-		print_r($session);
 		$key = get_shopify_api_key();
 		$secret = get_shopify_api_secret();
 		$shop = self::$shopify_shop;
 		$token = self::$shopify_token;
 
-		echo $shop;
-		echo ' -- ';
-		echo $token;
-		die();
+		$shopify = shopify_api_client($shop, $token, $key, $secret);
+
+		try {
+			//Get daily sales - orders since 00:00:00 until 11:59:59
+			$from_date = date('Y-m-d');
+			$to_date = date('Y-m-d');
+
+			$api_url = "/admin/orders.json?limit=1";
+
+
+			$last_order = $shopify('GET', $api_url);
+
+			return $last_order[0]['id'];
+
+		} catch (ShopifyApiException $e) {
+			echo '<pre>';
+			print_r($e);
+			echo '</pre>';
+		}
+	}
+
+	public static function get_orders_since($id){
+		$session = Session::instance()->as_array();
+		$key = get_shopify_api_key();
+		$secret = get_shopify_api_secret();
+		$shop = self::$shopify_shop;
+		$token = self::$shopify_token;
+
+		$shopify = shopify_api_client($shop, $token, $key, $secret);
+
+		try {
+
+			$api_url = "/admin/orders/count.json?since_id={$id}";
+			$last_order = $shopify('GET', $api_url);
+			//print_r($last_order);
+			return $last_order[0]['id'];
+
+		} catch (ShopifyApiException $e) {
+			echo '<pre>';
+			print_r($e);
+			echo '</pre>';
+		}
+	}
+
+	public static function get_daily_orders_count($method = '', $param = ''){
+		$session = Session::instance()->as_array();
+		$key = get_shopify_api_key();
+		$secret = get_shopify_api_secret();
+		$shop = self::$shopify_shop;
+		$token = self::$shopify_token;
 
 		$shopify = shopify_api_client($shop, $token, $key, $secret);
 
@@ -182,7 +234,6 @@ class Controller_App extends Controller_Master {
 
 			$today_order_count = $shopify('GET', $api_url);
 
-			//echo $today_order_count;
 			return $today_order_count;
 
 		} catch (ShopifyApiException $e) {

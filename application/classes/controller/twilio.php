@@ -17,37 +17,44 @@ class Controller_Twilio extends Controller {
 
 	public function action_callme() {
 
-		Twilio::instance()->call('+16138182762', "http://63.141.238.195/twilio/main");
+		Twilio::instance()->call('+16138182762', Kohana::$base_url . "/twilio/main");
 
+	}
+
+	private function menu_options() {
+		$gather = $this->twiml->gather(array('numDigits' => 1));
+
+		$gather->say("Press 1 to listen to a live feed of your sales.");
+
+		$gather->say("Press 9 to go to hell.");
 	}
 
 	public function action_main() {
 
-		if ($this->request->post()) {
+		if ($this->request->post('Digits')) {
 
 			switch ($this->request->post('Digits')) {
 				case '1':
-					return $this->action_feed();
+					$this->twiml->redirect(Kohana::$base_url . '/twilio/feed');
+					break;
+
 				case '9':
-						return $this->action_hell();
+					$this->twiml->redirect(Kohana::$base_url . '/talkingreports/twilio/hell');
+					break;
+
 				default:
 					$this->twiml->say("What the hell, that wasn't even a choice, try again numb nuts.");
+					$this->menu_options();
+					break;
 			}
 
 
 		} else {
 
 			$this->twiml->say("Welcome to Talking Reports!");
+			$this->menu_options();
 
 		}
-
-
-
-		$gather = $this->twiml->gather(array('numDigits' => 1));
-
-		$gather->say("Press 1 to listen to a live feed of your sales.");
-
-		$gather->say("Press 9 to go to hell.");
 
 	}
 
@@ -57,11 +64,11 @@ class Controller_Twilio extends Controller {
 
 	public function action_hell() {
 
-		if ($this->request->post()) {
+		if ($this->request->post('Digits')) {
 
 			$this->twiml->say("Go to hell.", array('loop' => $this->request->post('Digits')));
 
-			$this->twiml->redirect("/twilio/main");
+			$this->twiml->redirect(Kohana::$base_url . "/twilio/main");
 
 		} else {
 

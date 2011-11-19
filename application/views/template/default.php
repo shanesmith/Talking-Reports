@@ -10,7 +10,6 @@
 
     <script src="/assets/js/jquery-1.4.2.min.js" type="text/javascript"></script>
     <script src="/assets/js/superfish.js" type="text/javascript"></script>
-    <script src="/assets/js/flashobject.js" type="text/javascript"></script>
     <script src="/assets/js/jquery.faded.js" type="text/javascript"></script>
     <script src="/assets/js/cufon-yui.js" type="text/javascript"></script>
     <script type="text/javascript">
@@ -79,20 +78,6 @@
               </nav>
          </div>    
 		 </div>
-         <div class="row-2">
-           	 <div class="flash">
-               <div id="head">
-                   <div class="aligncenter"><a href="http://www.adobe.com/go/EN_US-H-GET-FLASH"><img src="http://www.adobe.com/images/shared/download_buttons/get_adobe_flash_player.png" alt="" /></a></div>
-                </div>
-                <script type="text/javascript">
-                      var fo = new FlashObject("flash/header_v8.swf", "head", "100%", "463", "8", "");
-                      fo.addParam("quality", "high");
-                      fo.addParam("wmode", "transparent");
-                      fo.addParam("scale", "noscale");
-                      fo.write("head");
-                </script>
-            </div>
-         </div>
          </header>
 <!--==============================content================================-->
 <div class="main">

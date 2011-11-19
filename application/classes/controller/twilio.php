@@ -60,6 +60,26 @@ class Controller_Twilio extends Controller {
 
 	public function action_feed() {
 
+		if ($this->request->post('Digits')) {
+
+			if ($this->request->post('Digits') == '#') {
+				$this->twiml->redirect(Kohana::$base_url . "/twilio/main");
+			}
+			else {
+				$this->twiml->say("Huh? If you want to quit, press the pound key.");
+				$this->twiml->redirect(Kohana::$base_url . "/twilio/feed");
+			}
+
+		} else {
+
+			$gather = $this->twiml->gather(array('numDigits' => 1, 'timeout' => 3));
+
+			if (rand(1,5) == 5) {
+				$gather->say("Cha-Ching.");
+			}
+
+		}
+
 	}
 
 	public function action_hell() {

@@ -3,6 +3,8 @@
 	{
 		public $template = 'template/default';	//Default template
 
+		require Kohana::find_file();
+
 		public function before()
 		{
 			//Set local var to what the template should be

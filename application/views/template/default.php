@@ -43,6 +43,9 @@
 	<![endif]-->
 </head>
 <body id="page1">
+
+<?php echo $content; ?>
+
 <div class="bg">
 <!--==============================header=================================-->
    <header class="header">

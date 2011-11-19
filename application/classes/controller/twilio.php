@@ -39,7 +39,7 @@ class Controller_Twilio extends Controller {
 					break;
 
 				case '9':
-					$this->twiml->redirect(Kohana::$base_url . '/twilio/hell');
+					$this->twiml->redirect(Kohana::$base_url . '/talkingreports/twilio/hell');
 					break;
 
 				default:

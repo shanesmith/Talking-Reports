@@ -371,3 +371,10 @@ footer {width:100%; padding:44px 0px 58px 0px; background:none; position:relativ
 	text-align:center;
 }
 
+
+
+/** CUSTOM CSS **/
+
+div#shop_name_label {
+	float: right;
+}

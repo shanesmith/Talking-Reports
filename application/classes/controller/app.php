@@ -72,26 +72,102 @@ class Controller_App extends Controller_Master {
 		$shopify = shopify_api_client($session['Shopify.shop'], $session['Shopify.token'], $this->shopify_api_key, $this->shopify_api_secret);
 
 		try {
+			//Daily count of orders
+			$order_count = Controller_App::get_daily_orders_count();
+			exit();
+
+			//Daily count of open orders
+			$open_orders_count = $this->_get_daily_orders_count('status', 'open');
+
+			//Daily count of closed orders
+			$closed_orders_count = $this->_get_daily_orders_count('status', 'closed');
+			//print_r($closed_orders_count);
+
+			//Daily orders
+			$daily_orders = $this->_get_daily_orders();
+
+			//$orders = json_decode($daily_orders);
+			$grand_total = 0;
+			foreach($daily_orders as $k => $order){
+				$qty = $order['line_items'][0]['quantity'];
+				$price = $order['line_items'][0]['price'];
+				$total_before_tax = $order['total_line_items_price'];
+				$total_price = $order['total_price'];
+
+				$grand_total += $total_price;
+			}
+
+			echo $grand_total;
+
 			//Get products
 			$products = $shopify('GET', '/admin/products.json', array('published_status' => 'published'));
 			//print_r($products);
 
-			//Get daily sales - orders since 00:00:00 until 11:59:59
-			$from_date = date('Y-m-d');
-			$to_date = date('Y-m-d');
-
-			$today_order_count = $shopify('GET', "/admin/orders/count.json?created_at_min={$from_date}T00:00:00-05:00");
-			$today_orders = $shopify('GET', "/admin/orders.json?created_at_min={$from_date}T00:00:00-05:00");
-
-			echo "You have {$today_order_count} orders today";
+			//echo "You have {$today_order_count} orders today";
 			die();
 		} catch (ShopifyApiException $e) {
+			echo '<pre>';
 			print_r($e);
+			echo '</pre>';
 		}
 
 		$view = View::factory('app/dashboard');
 		$view->shop_name = $session['Shopify.shop'];
 		$this->template->content = $view->render();
+	}
+
+	public function _get_daily_orders($method = '', $param = ''){
+		$session = Session::instance()->as_array();
+		$shopify = shopify_api_client($session['Shopify.shop'], $session['Shopify.token'], $this->shopify_api_key, $this->shopify_api_secret);
+
+		try {
+			//Get daily sales - orders since 00:00:00 until 11:59:59
+			$from_date = date('Y-m-d');
+			$to_date = date('Y-m-d');
+
+			$api_url = "/admin/orders.json?created_at_min={$from_date}T00:00:00-05:00";
+
+			if ($method !== ''){
+				$api_url .= "&{$method}={$param}";
+			}
+
+			$today_orders = $shopify('GET', $api_url);
+
+			return $today_orders;
+
+			return json_encode(array('response' => $today_orders));
+		} catch (ShopifyApiException $e) {
+			print_r($e);
+		}
+	}
+
+	public static function get_daily_orders_count($method = '', $param = ''){
+		$session = Session::instance()->as_array();
+		$key = get_shopify_api_key();
+		$secret = get_shopify_api_secret();
+
+		//$shopify = shopify_api_client($session['Shopify.shop'], $session['Shopify.token'], $this->shopify_api_key, $this->shopify_api_secret);
+		$shopify = shopify_api_client($session['Shopify.shop'], $session['Shopify.token'], $key, $secret);
+
+		try {
+			//Get daily sales - orders since 00:00:00 until 11:59:59
+			$from_date = date('Y-m-d');
+			$to_date = date('Y-m-d');
+
+			$api_url = "/admin/orders/count.json?created_at_min={$from_date}T00:00:00-05:00";
+
+			if ($method !== ''){
+				$api_url .= "&{$method}={$param}";
+			}
+
+			$today_order_count = $shopify('GET', $api_url);
+
+			//echo $today_order_count;
+			return $today_order_count;
+
+		} catch (ShopifyApiException $e) {
+			print_r($e);
+		}
 	}
 
 } // End Welcome

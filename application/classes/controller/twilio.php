@@ -17,7 +17,7 @@ class Controller_Twilio extends Controller {
 
 	public function action_callme() {
 
-		Twilio::instance()->call('+16138182762', Kohana::$base_url . "/twilio/main");
+		Twilio::instance()->call('+16138182762', "http://" . $_SERVER['SERVER_NAME'] . Kohana::$base_url . "/twilio/main");
 
 	}
 

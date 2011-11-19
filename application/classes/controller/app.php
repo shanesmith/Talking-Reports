@@ -78,10 +78,10 @@ class Controller_App extends Controller_Master {
 		$shopify = shopify_api_client($shop, $token, $key, $secret);
 
 		try {
+			echo Controller_App::get_daily_sales();
 			//Daily orders
-			$daily_orders = $this->_get_daily_orders();
+			$daily_orders = $this->get_daily_orders();
 
-			//$orders = json_decode($daily_orders);
 			$grand_total = 0;
 			foreach($daily_orders as $k => $order){
 				$qty = $order['line_items'][0]['quantity'];
@@ -90,8 +90,11 @@ class Controller_App extends Controller_Master {
 				$total_price = $order['total_price'];
 				$id = $order['id'];
 
-				//echo Controller_App::get_orders_since($id);
-				//echo '<br />';
+/*
+				echo $id . "<br />";
+				echo Controller_App::get_orders_since($id);
+				echo '<br />';
+				*/
 
 				$grand_total += $total_price;
 			}
@@ -102,7 +105,6 @@ class Controller_App extends Controller_Master {
 			//Daily count of orders
 			//$order_count = Controller_App::get_daily_orders_count();
 			$last_order = Controller_App::get_last_order_id();
-			echo $last_order;
 			exit();
 
 			//Daily count of open orders
@@ -129,7 +131,25 @@ class Controller_App extends Controller_Master {
 		$this->template->content = $view->render();
 	}
 
-	public function _get_daily_orders($method = '', $param = ''){
+	public static function get_daily_sales(){
+		$orders = Controller_App::get_daily_orders();
+
+		$grand_total = 0;
+		foreach($orders as $k => $order){
+			$qty = $order['line_items'][0]['quantity'];
+			$price = $order['line_items'][0]['price'];
+			$total_before_tax = $order['total_line_items_price'];
+			$total_price = $order['total_price'];
+			$id = $order['id'];
+
+			$grand_total += $total_price;
+		}
+
+		echo $grand_total;
+
+	}
+
+	public static function get_daily_orders($method = '', $param = ''){
 		$session = Session::instance()->as_array();
 		$key = get_shopify_api_key();
 		$secret = get_shopify_api_secret();
@@ -200,10 +220,11 @@ class Controller_App extends Controller_Master {
 
 		try {
 
+			$id = '96433502';
 			$api_url = "/admin/orders/count.json?since_id={$id}";
 			$last_order = $shopify('GET', $api_url);
-			//print_r($last_order);
-			return $last_order[0]['id'];
+
+			return $last_order;
 
 		} catch (ShopifyApiException $e) {
 			echo '<pre>';

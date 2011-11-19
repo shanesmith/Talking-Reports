@@ -1,32 +1,35 @@
 <?php
 
-class Controller_Twilio extends Controller_Master {
+class Controller_Twilio extends Controller {
 
-	public function index() {
+	/**
+	 * @var Twilio_Response
+	 */
+	protected $twiml;
 
-		
+	public function action_index() {
+
+		die("nuthin...");
 
 	}
 
-	public function callme() {
+	public function action_callme() {
 
 		Twilio::instance()->call('+16138182762', "http://63.141.238.195/twilio/answered");
 
 	}
 
-	public function answered() {
+	public function action_answered() {
 
-		$this->response->say("woot");
+		$this->twiml->say("woot");
 
 	}
 
-
-
 	public function before() {
 
-		$this->reponse = new Twilio_Response();
+		parent::before();
 
-		return parent::before();
+		$this->twiml = new Twilio_Response();
 
 	}
 
@@ -34,7 +37,7 @@ class Controller_Twilio extends Controller_Master {
 
 		if ($this->auto_respond === TRUE) {
 			$this->request->headers['Content-Type'] = File::mime_by_ext('xml');
-			$this->request->response = $this->response . "";
+			$this->request->response = (string)$this->twiml;
 		}
 
 		parent::after();

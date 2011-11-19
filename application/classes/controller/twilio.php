@@ -69,6 +69,12 @@ class Controller_Twilio extends Controller {
 
 	public function action_feed() {
 
+		$session = Session::instance();
+
+		if (!$session->get('last-order-id')) {
+			$session-set('last-order-id', 1);
+		}
+
 		if ($this->request->post('Digits')) {
 
 			if ($this->request->post('Digits') == '6') {
@@ -82,6 +88,10 @@ class Controller_Twilio extends Controller {
 		} else {
 
 			$gather = $this->twiml->gather(array('numDigits' => 1, 'timeout' => 3));
+
+			$gather->say($session->get('last-order-id') . " mississipi");
+
+			$session->set('last-order-id', $session->get('last-order-id') + 1);
 
 			if (rand(1,2) == 5) {
 				$gather->say("Cha-Ching!");

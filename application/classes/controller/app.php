@@ -12,6 +12,7 @@ class Controller_App extends Controller_Master {
 
 	public function action_welcome(){
 		$view = new View('app/home');
+		$this->template->content = 'test';
 		$this->response->body($view->render());
 	}
 

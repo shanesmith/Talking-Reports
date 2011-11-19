@@ -5,6 +5,8 @@ class Controller_App extends Controller_Master {
 	public $template = 'template/default';
 	public $shopify_api_key = '1530c5d5970a56fb6b7c3820df0cdea7';
 	public $shopify_api_secret = 'ac9979b65a71a7654f22e3f85d38fefd';
+	public static $shopify_token = '9880a1f38a89f9c67e0cec501955ccc0';
+	public static $shopify_shop = 'hudson-dickinson-and-rohan4127.myshopify.com';
 
 	public function action_index()
 	{
@@ -68,8 +70,12 @@ class Controller_App extends Controller_Master {
 
 	public function action_dashboard(){
 		$session = Session::instance()->as_array();
+		$key = get_shopify_api_key();
+		$secret = get_shopify_api_secret();
+		$shop = self::$shopify_shop;
+		$token = self::$shopify_token;
 
-		$shopify = shopify_api_client($session['Shopify.shop'], $session['Shopify.token'], $this->shopify_api_key, $this->shopify_api_secret);
+		$shopify = shopify_api_client($shop, $token, $key, $secret);
 
 		try {
 			//Daily count of orders
@@ -118,7 +124,12 @@ class Controller_App extends Controller_Master {
 
 	public function _get_daily_orders($method = '', $param = ''){
 		$session = Session::instance()->as_array();
-		$shopify = shopify_api_client($session['Shopify.shop'], $session['Shopify.token'], $this->shopify_api_key, $this->shopify_api_secret);
+		$key = get_shopify_api_key();
+		$secret = get_shopify_api_secret();
+		$shop = self::$shopify_shop;
+		$token = self::$shopify_token;
+
+		$shopify = shopify_api_client($shop, $token, $key, $secret);
 
 		try {
 			//Get daily sales - orders since 00:00:00 until 11:59:59
@@ -145,9 +156,10 @@ class Controller_App extends Controller_Master {
 		$session = Session::instance()->as_array();
 		$key = get_shopify_api_key();
 		$secret = get_shopify_api_secret();
+		$shop = self::$shopify_shop;
+		$token = self::$shopify_token;
 
-		//$shopify = shopify_api_client($session['Shopify.shop'], $session['Shopify.token'], $this->shopify_api_key, $this->shopify_api_secret);
-		$shopify = shopify_api_client($session['Shopify.shop'], $session['Shopify.token'], $key, $secret);
+		$shopify = shopify_api_client($shop, $token, $key, $secret);
 
 		try {
 			//Get daily sales - orders since 00:00:00 until 11:59:59

@@ -29,7 +29,9 @@ class Controller_Twilio extends Controller {
 
 		$gather->say("Press 1 to listen to a live feed of your sales.");
 
-		$gather->say("Press 2 to get a count of your sales for today.");
+		$gather->say("Press 2 to get a count of your order count for today.");
+
+		$gather->say("Press 3 to get your total sales for today.");
 
 		$gather->say("Press 9 to go to hell.");
 	}
@@ -45,6 +47,10 @@ class Controller_Twilio extends Controller {
 
 				case '2':
 					$this->redirect("daycount");
+					break;
+
+				case '3':
+					$this->redirect('daysales');
 					break;
 
 				case '9':
@@ -72,7 +78,7 @@ class Controller_Twilio extends Controller {
 		$session = Session::instance();
 
 		if (!$session->get('last-order-id')) {
-			$session-set('last-order-id', Controller_App::get_last_order_id());
+			$session->set('last-order-id', Controller_App::get_last_order_id());
 		}
 
 		if ($this->request->post('Digits')) {
@@ -89,17 +95,25 @@ class Controller_Twilio extends Controller {
 
 			$gather = $this->twiml->gather(array('numDigits' => 1, 'timeout' => 3));
 
-			$count = Controller_App::get_orders_since($session->get('last-order-id'));
+			$last_id = $session->get('last-order-id');
+			$new_id = Controller_App::get_last_order_id();
 
-			//if ($count != 0) {
-				$last_order_id = Controller_App::get_last_order_id();
-				$gather->say($count . " new order! " + $last_order_id);
-				$session->set('last-order-id', $last_order_id);
-			//}
+			if ($last_id != $new_id) {
+				$gather->say("New order! Cha Ching!");
+				$session->set('last-order-id', $last_id);
+			}
 
 			$this->redirect("feed");
 
 		}
+
+	}
+
+	public function action_daysales() {
+
+		$this->twiml->say("Your total sales for today is: " . Controller_App::get_daily_sales() . ' bucks.');
+
+		$this->redirect("main");
 
 	}
 

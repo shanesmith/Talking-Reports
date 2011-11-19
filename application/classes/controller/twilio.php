@@ -29,6 +29,8 @@ class Controller_Twilio extends Controller {
 
 		$gather->say("Press 1 to listen to a live feed of your sales.");
 
+		$gather->say("Press 2 to get a count of your sales for today.");
+
 		$gather->say("Press 9 to go to hell.");
 	}
 
@@ -111,7 +113,7 @@ class Controller_Twilio extends Controller {
 
 		$count = Controller_App::get_daily_orders_count();
 
-		$this->twiml->say("Your current sales count for today is: " + $count);
+		$this->twiml->say("Your current sales count for today is: " . $count);
 
 		$this->redirect("main");
 

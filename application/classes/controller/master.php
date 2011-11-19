@@ -1,7 +1,9 @@
 <?php
-	abstract class Controller_Master extends Controller_Template 
+require Kohana::find_file('vendor', 'twilio/twilio');
+
+abstract class Controller_Master extends Controller_Template
 	{
-		public $template = 'template/default';	//Default template
+		public $template = 'template/default'; 	//Default template
 
 		require Kohana::find_file();
 

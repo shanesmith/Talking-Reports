@@ -1,5 +1,6 @@
 <?php
-require Kohana::find_file('vendor', 'shopify/lib/shopify_api', 'php');
+//require Kohana::find_file('vendor', 'shopify/lib/shopify_api', 'php');
+require Kohana::find_file('vendor', 'shopify', 'php');
 
 abstract class Controller_Master extends Controller_Template {
 	

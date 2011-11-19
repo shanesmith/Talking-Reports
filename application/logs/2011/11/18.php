@@ -2183,3 +2183,103 @@
 --
 #0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
 #1 {main}
+2011-11-18 22:44:16 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:16 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:17 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:17 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}
+2011-11-18 22:44:21 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:21 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:21 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:21 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}
+2011-11-18 22:44:43 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:43 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:43 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:43 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}
+2011-11-18 22:44:44 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:44 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:44 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:44 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}
+2011-11-18 22:44:44 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:44 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:44 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:44 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}
+2011-11-18 22:44:44 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:44 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:45 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:45 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}
+2011-11-18 22:44:45 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:45 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:45 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:45 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}
+2011-11-18 22:44:45 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:45 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:45 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:45 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}
+2011-11-18 22:44:46 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:46 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:46 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:46 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}
+2011-11-18 22:44:46 --- ERROR: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+2011-11-18 22:44:46 --- STRACE: ErrorException [ 4 ]: syntax error, unexpected T_REQUIRE, expecting T_FUNCTION ~ APPPATH/classes/controller/master.php [ 6 ]
+--
+#0 [internal function]: Kohana_Core::shutdown_handler()
+#1 {main}
+2011-11-18 22:44:46 --- ERROR: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+2011-11-18 22:44:46 --- STRACE: HTTP_Exception_404 [ 404 ]: Unable to find a route to match the URI: favicon.ico ~ SYSPATH/classes/kohana/request.php [ 1126 ]
+--
+#0 /home/lucknerjb/Documents/Programming/Shopify/fog.smudel.ca/index.php(109): Kohana_Request->execute()
+#1 {main}

@@ -1,0 +1,107 @@
+CHANGELOG
+
+November 4th, 2010
+  - Removed prefixed slash from redirect on login.php
+
+October 22nd, 2010
+  - Added the default theme for Shopify Apps
+  - Created login.php to handle authentication
+  - Created logout.php
+  - Added Asset::create for the sake of CRUD
+  - Removed RTF document of documentation and added phpDocumentor output for documentation
+
+October 8th, 2010
+  - Fixed organizeArray for assets by adding key as the index if it exists
+  - Fixed metafield::get
+
+September 28th, 2010
+  - Added line-item as a special case xml tag
+
+September 7th, 2010
+  - Fixed a bug with cancelling recurring application charges. (thanks meeech!)
+
+August 12th, 2010
+  - Fixed a typo in Event::get
+
+August 4th, 2010
+  - Added a few tests, changed error conditions for getting data from the API
+  - Updated get methods for ApplicationCharge and RecurringApplicationCharge
+
+August 2nd, 2010
+  - Fixed a bug with removing objects through the API (thanks meeech!)
+  - Fixed an issue in recurseXML to properly return errors
+
+July 29th, 2010
+  - Fixed a minor typo and a bug in url_encode_params (thanks daniellmb!)
+
+July 26th, 2010
+  - Fixed a bug in arrayToXML to fix creating products with variants, images and options (thanks for the report and proposed fix by meeech! (http://github.com/meeech/))
+  - Example array to create product with variants
+    $fields = array(
+        'product-type' => 'Product',
+        'body-html' => 'This is some HTML for the Product',
+        'title' => 'This is a title',
+        'variants' => array(
+            array(
+                'price' => 10.00,
+                'option1' => 'first'
+            ),
+            array(
+              'price' => 11.00,
+              'option1' => 'second'
+            )
+        )
+    );
+
+July 14th, 2010
+  - Fixed a bug in Blog::remove -- missing $blog_id parameter
+
+July 9th, 2010
+  - Fixed some bugs in ApplicationCharge and RecurringApplicationCharge
+  - Made some modifications to both ApplicationCharge::get, ApplicationCharge::activate, RecurringApplicationCharge::get, RecurringApplicationCharge::activate
+    to make getting charges from the API easier, and the process of activation easier.
+
+July 7th, 2010
+  - Added some better error checking with XML results. An array will not be returned with errors if there is any.
+
+June 30th, 2010
+  - Added SSL support options
+  - Added lib/cacert.pem to verify Shopify SSL certificates
+  - Updated README
+  
+June 29th, 2010
+  - Added GZIP_PATH to shopify_api_config
+  - Added GZIP_ENABLED to enable or disable gzip compression
+
+June 25th, 2010
+  - Removed unnecessary parameters in Country::remove and Collect::remove
+  - Added test for private applications
+
+June 23rd, 2010
+  - Added Order::remove to delete orders (missing functionality)
+  - Added support for private applications. Your application secret is the password for your private application.
+
+June 18th, 2010
+  - Added SimpleTest autorun to test/shopify_api_test.php [daniellmb]
+  - Removed test/index.php
+
+June 17th, 2010
+  - Fixed a typo in Webhook
+  - Fixed a bug in url_encode_array to make spaces url friendly (converted to %20)
+
+June 7th, 2010
+  - Moved the include for shopify_api_config into shopify_api
+
+May 14th, 2010
+
+  Several changes made to the API.
+
+  - Added a public metafield variable for each necessary class to CRUD metafields for that object.
+  - To get metafields for the whole shop you can use the metafield variable in the Session class. 
+  - Cleaned up some URLs passed to sendToAPI
+  - HTTP Code Error Handling is now down in the miniCURL class
+  - If there is an HTTP Code Error returned the API will die with the content from the Shopify API
+  - Removed all references of the FORMAT constant from URLs in sendToAPI calls and instead moved it inside the sendToAPI function.
+  - Removed SUCCESS and CREATED constants and instead sendToAPI will check for the right HTTP code based on the request header
+  - Test setup made easier
+  - Any get method with a cache would return an empty array if cache was true and the cache was empty. If the cache is empty and cache is true, the API will be queried.

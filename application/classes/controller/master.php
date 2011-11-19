@@ -1,9 +1,9 @@
 <?php
+	require Kohana::find_file('vendor', 'shopify/lib/shopify_api', 'php');
+
 	abstract class Controller_Master extends Controller_Template 
 	{
 		public $template = 'template/default';	//Default template
-
-		require Kohana::find_file();
 
 		public function before()
 		{

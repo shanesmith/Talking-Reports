@@ -39,7 +39,7 @@ class Controller_Twilio extends Controller {
 					break;
 
 				case '9':
-					$this->twiml->redirect(Kohana::$base_url . '/talkingreports/twilio/hell');
+					$this->twiml->redirect(Kohana::$base_url . '/twilio/hell');
 					break;
 
 				default:
@@ -71,6 +71,8 @@ class Controller_Twilio extends Controller {
 			}
 
 		} else {
+
+			$this->twiml->say("feed");
 
 			$gather = $this->twiml->gather(array('numDigits' => 1, 'timeout' => 3));
 

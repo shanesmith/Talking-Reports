@@ -68,6 +68,27 @@ class Controller_App extends Controller_Master {
 
 	public function action_dashboard(){
 		$session = Session::instance()->as_array();
+
+		$shopify = shopify_api_client($session['Shopify.shop'], $session['Shopify.token'], $this->shopify_api_key, $this->shopify_api_secret);
+
+		try {
+			//Get products
+			$products = $shopify('GET', '/admin/products.json', array('published_status' => 'published'));
+			//print_r($products);
+
+			//Get daily sales - orders since 00:00:00 until 11:59:59
+			$from_date = date('Y-m-d');
+			$to_date = date('Y-m-d');
+
+			$today_order_count = $shopify('GET', "/admin/orders/count.json?created_at_min={$from_date}T00:00:00-05:00");
+			$today_orders = $shopify('GET', "/admin/orders.json?created_at_min={$from_date}T00:00:00-05:00");
+
+			echo "You have {$today_order_count} orders today";
+			die();
+		} catch (ShopifyApiException $e) {
+			print_r($e);
+		}
+
 		$view = View::factory('app/dashboard');
 		$view->shop_name = $session['Shopify.shop'];
 		$this->template->content = $view->render();

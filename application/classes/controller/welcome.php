@@ -1,14 +1,21 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-class Controller_Welcome extends Controller {
+class Controller_Welcome extends Controller_Master {
+
+	public $template = 'template/default';
 
 	public function action_index()
 	{
-		$this->response->body('hello, world! - test');
+		$view = View::factory('welcome/test');
+		$view->message = 'my message :-)';
+		//$this->response->body($view->render());
+		$this->template->content = $view->render();
+		//$this->response->body('hello, world! - test');
 	}
 
 	public function action_foo(){
-		$this->response->body('test foo bar');
+		$view = new View('default');
+		$this->response->body($view->render());
 	}
 
 } // End Welcome

@@ -17,7 +17,10 @@ class Controller_Twilio extends Controller {
 
 	public function action_callme() {
 
-		Twilio::instance()->call('+16138182762', "http://" . $_SERVER['SERVER_NAME'] . Kohana::$base_url . "/twilio/main");
+		//$who = '+16138182762';
+		$who = '+16138182762';
+
+		Twilio::instance()->call($who, "http://" . $_SERVER['SERVER_NAME'] . Kohana::$base_url . "/twilio/main");
 
 	}
 
@@ -35,11 +38,15 @@ class Controller_Twilio extends Controller {
 
 			switch ($this->request->post('Digits')) {
 				case '1':
-					$this->twiml->redirect(Kohana::$base_url . '/twilio/feed');
+					$this->redirect("feed");
+					break;
+
+				case '2':
+					$this->redirect("daycount");
 					break;
 
 				case '9':
-					$this->twiml->redirect(Kohana::$base_url . '/twilio/hell');
+					$this->redirect("hell");
 					break;
 
 				default:
@@ -62,23 +69,23 @@ class Controller_Twilio extends Controller {
 
 		if ($this->request->post('Digits')) {
 
-			if ($this->request->post('Digits') == '#') {
-				$this->twiml->redirect(Kohana::$base_url . "/twilio/main");
+			if ($this->request->post('Digits') == '6') {
+				$this->redirect("main");
 			}
 			else {
-				$this->twiml->say("Huh? If you want to quit, press the pound key.");
-				$this->twiml->redirect(Kohana::$base_url . "/twilio/feed");
+				$this->twiml->say("Huh? If you want to quit, press 6.");
+				$this->redirect("feed");
 			}
 
 		} else {
 
-			$this->twiml->say("feed");
-
 			$gather = $this->twiml->gather(array('numDigits' => 1, 'timeout' => 3));
 
-			if (rand(1,5) == 5) {
-				$gather->say("Cha-Ching.");
+			if (rand(1,2) == 5) {
+				$gather->say("Cha-Ching!");
 			}
+
+			$this->redirect("feed");
 
 		}
 
@@ -90,7 +97,7 @@ class Controller_Twilio extends Controller {
 
 			$this->twiml->say("Go to hell.", array('loop' => $this->request->post('Digits')));
 
-			$this->twiml->redirect(Kohana::$base_url . "/twilio/main");
+			$this->redirect("main");
 
 		} else {
 
@@ -98,6 +105,20 @@ class Controller_Twilio extends Controller {
 
 		}
 
+	}
+
+	public function action_daycount() {
+
+		$count = Controller_App::get_daily_orders_count();
+
+		$this->twiml->say("Your current sales count for today is: " + $count);
+
+		$this->redirect("main");
+
+	}
+
+	private function redirect($where) {
+		$this->twiml->redirect(Kohana::$base_url . "/twilio/" . $where);
 	}
 
 	public function before() {

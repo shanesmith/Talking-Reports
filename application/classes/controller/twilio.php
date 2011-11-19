@@ -72,7 +72,7 @@ class Controller_Twilio extends Controller {
 		$session = Session::instance();
 
 		if (!$session->get('last-order-id')) {
-			$session-set('last-order-id', 1);
+			$session-set('last-order-id', Controller_App::get_last_order_id());
 		}
 
 		if ($this->request->post('Digits')) {
@@ -89,13 +89,13 @@ class Controller_Twilio extends Controller {
 
 			$gather = $this->twiml->gather(array('numDigits' => 1, 'timeout' => 3));
 
-			$gather->say($session->get('last-order-id') . " mississipi");
+			$count = Controller_App::get_orders_since($session->get('last-order-id'));
 
-			$session->set('last-order-id', $session->get('last-order-id') + 1);
-
-			if (rand(1,2) == 5) {
-				$gather->say("Cha-Ching!");
-			}
+			//if ($count != 0) {
+				$last_order_id = Controller_App::get_last_order_id();
+				$gather->say($count . " new order! " + $last_order_id);
+				$session->set('last-order-id', $last_order_id);
+			//}
 
 			$this->redirect("feed");
 

@@ -5,7 +5,7 @@ class Controller_App extends Controller_Master {
 	public $template = 'template/default';
 	public $shopify_api_key = '1530c5d5970a56fb6b7c3820df0cdea7';
 	public $shopify_api_secret = 'ac9979b65a71a7654f22e3f85d38fefd';
-	public static $shopify_token = '9880a1f38a89f9c67e0cec501955ccc0';
+	public static $shopify_token = 'd555c4d994b096b633be31b9644d05ae';
 	public static $shopify_shop = 'hudson-dickinson-and-rohan4127.myshopify.com';
 
 	public function action_index()
@@ -148,16 +148,24 @@ class Controller_App extends Controller_Master {
 
 			return json_encode(array('response' => $today_orders));
 		} catch (ShopifyApiException $e) {
+			echo '<pre>';
 			print_r($e);
+			echo '</pre>';
 		}
 	}
 
 	public static function get_daily_orders_count($method = '', $param = ''){
 		$session = Session::instance()->as_array();
+		print_r($session);
 		$key = get_shopify_api_key();
 		$secret = get_shopify_api_secret();
 		$shop = self::$shopify_shop;
 		$token = self::$shopify_token;
+
+		echo $shop;
+		echo ' -- ';
+		echo $token;
+		die();
 
 		$shopify = shopify_api_client($shop, $token, $key, $secret);
 
@@ -178,7 +186,9 @@ class Controller_App extends Controller_Master {
 			return $today_order_count;
 
 		} catch (ShopifyApiException $e) {
+			echo '<pre>';
 			print_r($e);
+			echo '</pre>';
 		}
 	}
 
